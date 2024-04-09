@@ -7,13 +7,13 @@
     <div class="row">
       <div class="col-4">
         <div class="row">
-          <div class="col">
-            <h4>Star What</h4>
+          <div class="col-4">
+            <h5>Star What</h5>
           </div>
-          <div class="col">
+          <div class="col-4">
             <h5>Accueil</h5>
           </div>
-          <div class="col">
+          <div class="col-4">
             <h5>Score</h5>
           </div>
         </div>
@@ -21,7 +21,6 @@
     </div>
   </header>
 </template>
-
 
 <style scoped>
 
