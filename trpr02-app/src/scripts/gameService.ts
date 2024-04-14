@@ -5,18 +5,18 @@ const CHARACTER_STARTING_PATH = '/characters?_page='
 const CHARACTER_ENDING_PATH = '&_limit=1'
 
 export type Ship = {
-  id: number
+  id: string
   name: string
 }
 
 export type Ranking = {
-  id: number
+  id: string
   name: string
   score: number
 }
 
 export type Character = {
-  id: number
+  id: string
   name: string
   credit: number
   experience: number
