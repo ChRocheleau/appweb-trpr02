@@ -65,8 +65,8 @@ function handleCombat() {
             <p>Rank - 0 CG</p>
             <p class="text-center">{{ props.playerShipToDisplay }}</p>
             <div class="container">
-              <div class="row justify-content-center mt-5">
-                <div class="col-md-6">
+              <div class="row justify-content-center mt-1">
+                <div class="col-md-12">
                   <div class="progress">
                     <div
                       class="progress-bar bg-primary"
