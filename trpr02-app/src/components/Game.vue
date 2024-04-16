@@ -23,8 +23,8 @@ function handleCombat() {
     <div class="row">
       <div class="col-6">
         <div class="bg-primary text-white">
-        <p>Actions</p>
-      </div>
+          <p>Actions</p>
+        </div>
         <div id="GameBox" class="container row p-3 mx-auto">
           <div class="col">
             <button @click="handleCombat" class="btn btn-primary form-control">
@@ -63,7 +63,25 @@ function handleCombat() {
           </div>
           <div class="bg-light text-white">
             <p>Rank - 0 CG</p>
-            <p class="text-center"> {{ props.playerShipToDisplay }} </p>
+            <p class="text-center">{{ props.playerShipToDisplay }}</p>
+            <div class="container">
+              <div class="row justify-content-center mt-5">
+                <div class="col-md-6">
+                  <div class="progress">
+                    <div
+                      class="progress-bar bg-primary"
+                      role="progressbar"
+                      style="width: 75%"
+                      aria-valuenow="75"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      <span class="progress-text">75%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -87,4 +105,23 @@ function handleCombat() {
   //border: 2px solid #ccc;
   border-radius: 10px;
 }
+.progress {
+      height: 30px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+
+    .progress-bar {
+      width: 50px;
+      border-radius: 5px;
+    }
+
+    .progress-text {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: bold;
+      }
 </style>
