@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import Ship from './../scripts/gameService.ts'
 import { ref } from "vue";
+
 const MAX_MISSION = 5;
 const currentMission = ref(1);
 
@@ -20,12 +22,7 @@ function handleCombat() {
     <div class="row">
         <div class="col-6">
             <p>Actions</p>
-        </div>
-        <div class="col-3">
-            <p>Mission en cours</p>
-        </div>
-    </div>
-    <div id="actions" class="container row p-3 mx-auto">
+            <div id="actions" class="container row p-3 mx-auto">
       <div class="col-2">
         <button @click="handleCombat" class="btn btn-primary form-control">
           Combattre
@@ -41,13 +38,19 @@ function handleCombat() {
           Terminer la mission et réparer le vaisseau
         </button>
       </div>
-      <div id="mission" class="container col-3 p-3 mx-auto">
+    </div>
+        </div>
+        <div class="col-3">
+            <p>Mission en cours</p>
+            <div id="mission" class="container col-3 p-3 mx-auto">
         <p>{{ currentMission }}/5</p>
         <p>
           Objectif: survivre à 5 missions en obtenant le plus de crédits
           galactiques.
         </p>
       </div>
+        </div>
+    </div>
     </div>
 
     <div id="playerShip" class="container col-3 p-3 mx-auto">
