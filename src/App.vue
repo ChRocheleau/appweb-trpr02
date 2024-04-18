@@ -4,13 +4,12 @@ import MainMenu from './components/MainMenu.vue'
 import Game from './components/Game.vue'
 import Score from './components/Score.vue'
 import Footer from './components/Footer.vue'
-import Ship from './scripts/gameService.ts'
 import { ref } from 'vue'
 
-const chosenPlayerName = ref<String>('')
-const chosenPlayerShip = ref<Ship>()
+const chosenPlayerName = ref<string>('')
+const chosenPlayerShip = ref<string>('')
 
-function handleLaunch(playerName: String, playerShip: Ship) {
+function handleLaunch(playerName: string, playerShip: string) {
 chosenPlayerName.value = playerName
 chosenPlayerShip.value = playerShip
 currentScreen.value = 'Game'

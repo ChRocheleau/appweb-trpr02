@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import GameService from '../scripts/gameService.ts'
-import Ship from '../scripts/gameService.ts'
 
 const ships = await new GameService().getShips()
 const playerName = ref<string>("")
-const playerShip = ref<Ship>(new Ship())
+const playerShip = ref<string>("")
 
 const emit = defineEmits<{
-  (event: 'launchGame', chosenName: string, chosenShip: Ship): void
+  (event: 'launchGame', chosenName: string, chosenShip: string): void
 }>()
 
 function formCompleted() {  
@@ -35,7 +34,7 @@ function formCompleted() {
                 <div class="mb-3">
                     <select v-model="playerShip" class="form-select" name="historique" id="historique">
                         <option disabled selected :value="null">Choisir...</option>
-                        <option v-for="ship in ships" :key="ship.id" :value="ship.name">
+                        <option v-for="ship in ships" :key="ship.id" :value="ship.id">
                             {{ ship.name }}
                         </option>
                     </select>
