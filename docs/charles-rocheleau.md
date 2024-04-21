@@ -8,10 +8,11 @@ Le Travail pratique 2 porte sur un jeu de combat de vaisseaux utilisant typescri
 
 Le code suivant est une version révisée des points en général:
 
+## Semaine 1
+
 ## Ici la norme de mettre les requêtes à l'API dans un GameService est bien respectée et le code est très propre. Ce qui était un des points non respecté du TP01, il y a une nette amélioration!
 ```ts
 <script setup lang="ts">
-
 //gameService.ts
 export default class GameService {
   API_URL: string
@@ -77,6 +78,76 @@ export default class GameService {
         <Score v-if="currentScreen === 'Score'" />
         <Footer />
     </div>
+</template>
+
+</script>
+```
+
+## Semaine 2
+
+## Pour le code suivant, les requêtes d'information sont faites dans un OnMounted async avec un try-catch. Ce fonctionnement robuste inclus la possibilitée d'erreurs et attends de recevoir l'information. C'est une très bonne façon de faire des requêtes!
+
+```ts
+<script setup lang="ts">
+//Game.vue
+onMounted(async () => {
+  try {
+    charactersIds.value = await gameService.getCharactersIds();
+    playerShip.value = await gameService.getShip(props.playerShipToDisplay as string);
+    const randomOpponentId = getRandomCharacterId();
+    opponent.value = await getOpponent(randomOpponentId);
+    isLoading.value = false;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+});
+
+</script>
+```
+## Ici une fonction universelle est employée pour obtenir une valeur aléatoire parmis un array. Elle est utilisée pour recevoir l'ID d'un adversaire aléatoire. Cette fonction assure que l'adversaire sera toujours aléatoire. Beau code!
+```ts
+<script setup lang="ts">
+
+//Game.vue
+function getRandomCharacterId(): string {
+  const maxIndex = charactersIds.value.length - 1;
+  const randomIndex = Math.floor(Math.random() * (maxIndex + 1));
+  return charactersIds.value[randomIndex];
+}
+
+</script>
+```
+## Pour le code suivant, une variable booléenne isLoading est utilisée pour s'assurer de l'intégrité des valeurs de l'adversaire qui est chargé dynamiquement avec la BD. C'est seulement lorsque toutes les requêtes à la BD sont completées que les valeurs de l'adversaire sont affichées. C'est un bon code qui évite les erreurs d'affichage. 
+```ts
+<script setup lang="ts">
+
+//Game.vue
+onMounted(async () => {
+  try {
+    //code existant
+    isLoading.value = false;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+});
+<template>
+    <div class="col-6" v-if="!isLoading">> //tant qu'il charge rien n'est affiché
+        <div id="GameBox" class="row mx-auto">
+          <div class="bg-primary text-white d-flex align-items-center py-2">
+            <p class="m-0">{{ opponent.name }}</p>
+          </div>
+          <div class="bg-light text-white" style="height: 15vh">
+            <p>{{ opponent.experience }} - {{ opponent.credit.toString() }} CG</p>
+            <p class="text-center">{{ opponent.ship.name }}</p>
+            <div class="container">
+              <div class="row justify-content-center mt-1">
+                <div class="col-md-12">
+                  <div class="progress">
+                    <div class="progress-bar bg-primary" role="progressbar"
+                      :style="{ width: opponent.ship.vitality + '%' }" aria-valuenow="100" aria-valuemin="0"
+                      aria-valuemax="100">
+                      <span class="progress-text">{{ opponent.ship.vitality }}%</span>
+                      //fermeture divs
 </template>
 
 </script>

@@ -39,7 +39,7 @@ function formCompleted() {
                         </option>
                     </select>
                 </div>
-                <button onclick="formCompleted()" type="submit" class="btn btn-primary form-control">Débuter la partie</button>
+                <button @click="formCompleted()" type="submit" class="btn btn-primary form-control">Débuter la partie</button>
             </form>
         </div>
     </div>

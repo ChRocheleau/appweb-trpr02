@@ -13,6 +13,5 @@ hero:
     - theme: brand
       text: Revue du code de Charles Rocheleau
       link: /charles-rocheleau
-
 ---
 

@@ -6,27 +6,59 @@ import { ref, onMounted } from "vue";
 
 const props = defineProps({
   playerNameToDisplay: String,
-  playerShipToDisplay: String,
+  playerShipToDisplay: String
 });
 
 const gameService = new GameService();
-const opponent = ref<Character | null>(null);
-const playerShip = ref<Ship>();
+const MAX_MISSION = 5;
+const PLAYER_ID: string = "0";
+const PLAYER_STARTING_CREDIT = 0;
+const PLAYER_RANK = 4;
+const PLAYER_STARTING_LIFE = 100;
+const currentMission = ref(1);
+
+const playerShip = ref<Ship>({
+  id: '',
+  name: ''
+});
+
+const opponent = ref<Character>({
+  id: '',
+  name: '',
+  credit: 0,
+  experience: 0,
+  ship: {
+    id: '',
+    name: '',
+    vitality: 0
+  }
+});
+
 const charactersIds = ref<string[]>([]);
-const shipsIds = ref<string[]>([]);
+const isLoading = ref(true);
 
 onMounted(async () => {
   try {
     charactersIds.value = await gameService.getCharactersIds();
-    shipsIds.value = await gameService.getCharactersIds();
     playerShip.value = await gameService.getShip(props.playerShipToDisplay as string);
     const randomOpponentId = getRandomCharacterId();
-    const randomOpponentShipId = getRandomShipId();
     opponent.value = await getOpponent(randomOpponentId);
-    opponent.ship.value = await getShip(randomOpponentShipId);
+    isLoading.value = false;
     console.log('Opponent:', opponent.value);
   } catch (error) {
     console.error('Error:', error);
+  }
+});
+
+const player = ref<Character>({
+  id: PLAYER_ID,
+  name: props.playerNameToDisplay as string,
+  credit: PLAYER_STARTING_CREDIT,
+  experience: PLAYER_RANK,
+  ship: {
+    id: playerShip.value.id as string,
+    name: playerShip.value.name as string,
+    vitality: PLAYER_STARTING_LIFE
   }
 });
 
@@ -41,40 +73,15 @@ async function getOpponent(id: string): Promise<Character> {
   return opponentData;
 }
 
-function getRandomShipId(): string {
-  const maxIndex = shipsIds.value.length - 1;
-  const randomIndex = Math.floor(Math.random() * (maxIndex + 1));
-  return shipsIds.value[randomIndex];
-}
-
-async function getShip(id: string): Promise<Ship> {
-  const shipData: Ship = await gameService.getShip(id);
-  return shipData;
-}
-
-const MAX_MISSION = 5;
-const PLAYER_ID: string = "0";
-const PLAYER_STARTING_CREDIT = 0;
-const PLAYER_RANK = 4;
-const PLAYER_STARTING_LIFE = 100;
-const currentMission = ref(1);
-const player = ref<Character>({
-  id: PLAYER_ID,
-  name: props.playerNameToDisplay as string,
-  credit: PLAYER_STARTING_CREDIT,
-  experience: PLAYER_RANK,
-  ship: {
-    id: playerShip.value?.id as string,
-    name: playerShip.value?.name as string,
-    vitality: PLAYER_STARTING_LIFE
-  }
-});
-
 function handleCombat() {
   if (currentMission.value < MAX_MISSION) {
     currentMission.value++;
   }
 }
+onMounted(() => {
+      console.log("Player: ", player.value);
+    });
+
 </script>
 
 <template>
@@ -145,13 +152,13 @@ function handleCombat() {
           </div>
         </div>
       </div>
-      <div class="col-6" v-if="opponent">
+      <div class="col-6" v-if="!isLoading">>
         <div id="GameBox" class="row mx-auto">
           <div class="bg-primary text-white d-flex align-items-center py-2">
             <p class="m-0">{{ opponent.name }}</p>
           </div>
           <div class="bg-light text-white" style="height: 15vh">
-            <p>{{ opponent.experience }} - {{ opponent.credit }} CG</p>
+            <p>{{ opponent.experience }} - {{ opponent.credit.toString() }} CG</p>
             <p class="text-center">{{ opponent.ship.name }}</p>
             <div class="container">
               <div class="row justify-content-center mt-1">

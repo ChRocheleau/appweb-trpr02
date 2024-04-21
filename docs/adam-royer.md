@@ -8,6 +8,8 @@ Le Travail pratique 2 porte sur un jeu de combat de vaisseaux utilisant typescri
 
 Le code suivant est une version révisée des points en général:
 
+## Semaine 1
+
 ## Code très propre! Le placement des types personnalisés dans gameService est une bonne pratique. Le code est plus clair et organisé.
 ```ts
 <script setup lang="ts">
@@ -75,6 +77,8 @@ function formCompleted() {
 
 </script>
 ```
+
+## Semaine 2
 
 <script setup>
 import { useData } from 'vitepress'
