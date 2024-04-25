@@ -1,5 +1,12 @@
 <script setup lang="ts">
 
+const HOME_SCREEN: string = "MainMenu"
+const SCORE_SCREEN: string = "Score"
+
+const emit = defineEmits<{
+  (event: 'updateScreen', chosenScreen: string): void
+}>()
+
 </script>
 
 <template>
@@ -11,10 +18,10 @@
             <h3><b>Star What</b></h3>
           </div>
           <div class="col-3">
-            <h5>Accueil</h5>
+            <h5 @click="emit('updateScreen', HOME_SCREEN)">Accueil</h5>
           </div>
           <div class="col-3">
-            <h5>Score</h5>
+            <h5 @click="emit('updateScreen', SCORE_SCREEN)">Score</h5>
           </div>
         </div>
       </div>
@@ -23,5 +30,11 @@
 </template>
 
 <style scoped>
+  h5 {
+    cursor: pointer;
+  }
 
+  h5:hover {
+    font-weight: bold;
+  }
 </style>

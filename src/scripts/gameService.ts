@@ -28,6 +28,13 @@ export type Character = {
   }
 }
 
+export enum Experience {
+  Débutant,
+  Confirmé,
+  Expert,
+  Maître
+}
+
 export default class GameService {
   API_URL: string
   characterIds: string[] | null = null;
@@ -78,6 +85,11 @@ export default class GameService {
 
   async getCharacter (characterPlacement : string) {
     const { data } = await axios.get(this.API_URL + CHARACTER_STARTING_PATH + characterPlacement + CHARACTER_ENDING_PATH)
+    return data
+  }
+
+  async getCharacterById (characterPlacement : string) {
+    const { data } = await axios.get(this.API_URL + CHARACTERS_PATH +'/'+ characterPlacement)
     return data
   }
 }

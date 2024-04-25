@@ -10,22 +10,29 @@ const chosenPlayerName = ref<string>('')
 const chosenPlayerShip = ref<string>('')
 
 function handleLaunch(playerName: string, playerShip: string) {
-chosenPlayerName.value = playerName
-chosenPlayerShip.value = playerShip
-currentScreen.value = 'Game'
+  chosenPlayerName.value = playerName
+  chosenPlayerShip.value = playerShip
+  currentScreen.value = 'Game'
+}
+
+function handleScreenChange(newScreen: string) {
+  currentScreen.value = newScreen
 }
 const currentScreen = ref('MainMenu')
 </script>
 
 <template>
     <div id="fullPage" class="container-fluid" style="width: 150vh">
-        <Header />
+        <Header 
+          @updateScreen="handleScreenChange"
+        />
         <Suspense><MainMenu v-if="currentScreen === 'MainMenu'"
           @launchGame="handleLaunch"
         /></Suspense>
         <Game v-if="currentScreen === 'Game'"
           :playerNameToDisplay="chosenPlayerName"
           :playerShipToDisplay="chosenPlayerShip"
+          @updateScreen="handleScreenChange"
         />
         <Score v-if="currentScreen === 'Score'" />
         <Footer />

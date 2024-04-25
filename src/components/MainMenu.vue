@@ -5,19 +5,27 @@ import GameService from '../scripts/gameService.ts'
 const ships = await new GameService().getShips()
 const playerName = ref<string>("")
 const playerShip = ref<string>("")
+const formComplete = ref(false);
 
 const emit = defineEmits<{
   (event: 'launchGame', chosenName: string, chosenShip: string): void
 }>()
 
-function formCompleted() {  
-    emit('launchGame', playerName.value, playerShip.value)
+function formCompleted() { 
+    formComplete.value = true; 
+    const selectedShip = ships.find((ship: { id: string; }) => ship.id == playerShip.value)
+    const shipName = selectedShip.name
+    emit('launchGame', playerName.value, shipName)
 }
 </script>
 <template>
-    <div id="MainMenu" class="py-3 container-fluid" style="height: 84vh;">
+    <div id="MainMenuPage" class="py-3 container-fluid" style="height: 84vh;">
         <div id="questTitle">
             <h4><b>Votre objectif: </b>survivre à 5 missions en obtenant le plus de crédits galactiques.</h4>
+        </div>
+
+        <div v-if="(formComplete && playerName == '') || (formComplete && playerShip == '')" class="alert alert-danger mt-3">
+            <strong>Erreur:</strong> Veuillez entrer votre nom et choisir un vaisseau.
         </div>
 
         <div id="logForm" class="col-3 p-3 mx-auto">
@@ -33,7 +41,6 @@ function formCompleted() {
                 </div>
                 <div class="mb-3">
                     <select v-model="playerShip" class="form-select" name="historique" id="historique">
-                        <option disabled selected :value="null">Choisir...</option>
                         <option v-for="ship in ships" :key="ship.id" :value="ship.id">
                             {{ ship.name }}
                         </option>
@@ -46,7 +53,7 @@ function formCompleted() {
 </template>
 
 <style scoped>
-#MainMenu {
+#MainMenuPage {
     height: 100%;
 }
 #logForm {
