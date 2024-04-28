@@ -1,52 +1,60 @@
 <script setup lang="ts">
-import { Character } from "./../scripts/gameService.ts";
-import { Experience } from "./../scripts/gameService.ts";
-import GameService from "./../scripts/gameService.ts";
-import { ref, onMounted, computed } from "vue";
+import { Character } from './../scripts/gameService.ts'
+import GameService from './../scripts/gameService.ts'
+import ActionsCard from './ActionsCard.vue'
+import MissionsCard from './MissionsCard.vue'
+import CharacterCard from './CharacterCard.vue'
+import { ref, onMounted, computed } from 'vue'
 // @ts-ignore
-import { Modal } from "bootstrap";
+import { Modal } from 'bootstrap'
 
 const props = defineProps({
   playerNameToDisplay: String,
-  playerShipToDisplay: String,
-});
+  playerShipToDisplay: String
+})
 
 const emit = defineEmits<{
-  (event: "updateScreen", chosenScreen: string): void;
-}>();
-const HOME_SCREEN: string = "MainMenu";
+  (event: 'updateScreen', chosenScreen: string): void
+  (event: 'launchScore', playerScore: number): void
+}>()
+const HOME_SCREEN: string = 'MainMenu'
+const SCORE_SCREEN: string = 'Score'
 
-const gameService = new GameService();
-const MAX_MISSION = 5;
-const PLAYER_ID: string = "0";
-const PLAYER_STARTING_CREDIT = 0;
-const PLAYER_RANK = 4;
-const PLAYER_STARTING_LIFE = 100;
-const currentMission = ref(1);
+const gameService = new GameService()
+const MAX_MISSION = 5
+const PLAYER_ID: string = '0'
+const PLAYER_STARTING_CREDIT = 0
+const PLAYER_RANK = 4
+const PLAYER_STARTING_LIFE = 100
+const currentMission = ref(1)
 
-const opponents = ref<Character[]>([]);
-const currentOpponentIndex = ref(0);
-const opponentInitialVitalities = ref<number[]>([]);
-const opponentCurrentVitalities = ref<number[]>([]);
+const opponents = ref<Character[]>([])
+const currentOpponentIndex = ref(0)
+const opponentInitialVitalities = ref<number[]>([])
+const opponentCurrentVitalities = ref<number[]>([])
+const charactersIds = ref<string[]>([])
 
-const charactersIds = ref<string[]>([]);
-const isLoading = ref(true);
+const isLoading = ref(true)
+const alertMessage = ref('')
+
+const GAME_OVER_MESSAGE = `Vous êtes mort, la mission à échouée!`
+const MISSION_OVER_MESSAGE = `Vous avez gagné la mission!`
 
 onMounted(async () => {
   try {
-    charactersIds.value = await gameService.getCharactersIds();
+    charactersIds.value = await gameService.getCharactersIds()
     for (let i = 0; i < MAX_MISSION; i++) {
-      const randomOpponentId = getRandomCharacterId();
-      const opponentData = await getOpponent(randomOpponentId);
-      opponents.value.push(opponentData);
-      opponentInitialVitalities.value.push(opponentData.ship.vitality);
-      opponentCurrentVitalities.value.push(opponentData.ship.vitality);
+      const randomOpponentId = getRandomCharacterId()
+      const opponentData = await getOpponent(randomOpponentId)
+      opponents.value.push(opponentData)
+      opponentInitialVitalities.value.push(opponentData.ship.vitality)
+      opponentCurrentVitalities.value.push(opponentData.ship.vitality)
     }
-    isLoading.value = false;
+    isLoading.value = false
   } catch (error) {
-    console.error("Error:", error);
+    console.error('Error:', error)
   }
-});
+})
 
 const player = ref<Character>({
   id: PLAYER_ID,
@@ -54,175 +62,207 @@ const player = ref<Character>({
   credit: PLAYER_STARTING_CREDIT,
   experience: PLAYER_RANK,
   ship: {
-    id: "",
+    id: '',
     name: props.playerShipToDisplay as string,
-    vitality: PLAYER_STARTING_LIFE,
-  },
-});
+    vitality: PLAYER_STARTING_LIFE
+  }
+})
 
 const opponentVitalityPercentage = computed(() => {
   const initialVitality =
-    opponentInitialVitalities.value[currentOpponentIndex.value];
+    opponentInitialVitalities.value[currentOpponentIndex.value]
   const currentVitality =
-    opponentCurrentVitalities.value[currentOpponentIndex.value];
-  return Math.round((currentVitality / initialVitality) * 100);
-});
+    opponentCurrentVitalities.value[currentOpponentIndex.value]
+  return Math.ceil((currentVitality / initialVitality) * 100)
+})
 
 function getRandomCharacterId(): string {
-  const maxIndex = charactersIds.value.length - 1;
-  const randomIndex = Math.floor(Math.random() * (maxIndex + 1));
-  return charactersIds.value[randomIndex];
+  const maxIndex = charactersIds.value.length - 1
+  const randomIndex = Math.floor(Math.random() * (maxIndex + 1))
+  return charactersIds.value[randomIndex]
 }
 
 async function getOpponent(id: string): Promise<Character> {
-  const opponentData: Character = await gameService.getCharacterById(id);
-  return opponentData;
+  const opponentData: Character = await gameService.getCharacterById(id)
+  return opponentData
 }
 
 function fromExperienceToHitProbabilityConverter(experience: number): number {
-  let probability: number;
+  let probability: number
 
   switch (experience) {
     case 1:
-      probability = 0.2;
-      break;
+      probability = 0.2
+      break
     case 2:
-      probability = 0.35;
-      break;
+      probability = 0.35
+      break
     case 3:
-      probability = 0.5;
-      break;
+      probability = 0.5
+      break
     case 4:
-      probability = 0.7;
-      break;
+      probability = 0.7
+      break
     default:
-      probability = 0;
-      break;
+      probability = 0
+      break
   }
 
-  return probability;
-}
-
-function experienceConverter(experience: number) {
-  let niveau: string;
-
-  switch (experience) {
-    case 1:
-      niveau = Experience[Experience.Débutant];
-      break;
-    case 2:
-      niveau = Experience[Experience.Confirmé];
-      break;
-    case 3:
-      niveau = Experience[Experience.Expert];
-      break;
-    case 4:
-      niveau = Experience[Experience.Maître];
-      break;
-    default:
-      niveau = "Erreur niveau inconnu";
-      break;
-  }
-
-  return niveau;
+  return probability
 }
 
 function handleCombat() {
-  handlePlayerAttack();
-  handleOpponentAttack();
+  handlePlayerAttack()
+  handleOpponentAttack()
   if (
     opponentCurrentVitalities.value[currentOpponentIndex.value as number] <= 0
   ) {
-    handleMissionOver();
+    handleMissionOver('credit')
   }
   if (player.value.ship.vitality <= 0) {
-    gameOver();
+    gameOver()
   }
 }
 
 function gameOver() {
-  handleGameOverMessage();
-  emit('updateScreen', HOME_SCREEN);
+  showAlert(GAME_OVER_MESSAGE)
+  const modalElement = document.querySelector('.modal')
+  const modal = Modal.getOrCreateInstance(modalElement)
+
+  emit('launchScore', 0)
+
+  modalElement?.addEventListener('hidden.bs.modal', () => {
+    emit('updateScreen', HOME_SCREEN)
+  })
+
+  const modalTitle = modalElement?.querySelector('.modal-title')
+  if (modalTitle) {
+    modalTitle.textContent = 'Mission Échouée!'
+  }
+
+  modal.show()
 }
 
-function handleMissionOver() {
-  console.log("mission over");
-  player.value.credit += opponents.value[currentOpponentIndex.value].credit;
-  handleMissionOverMessage();
+function handleMissionOver(action: string) {
   if (currentMission.value < MAX_MISSION) {
-    currentMission.value++;
-    currentOpponentIndex.value++;
+    if (action == 'message') {
+      showAlert(MISSION_OVER_MESSAGE)
+    } else if (action == 'repair') {
+      repairShip()
+    } else if (action == 'credit') {
+      player.value.credit += opponents.value[currentOpponentIndex.value].credit
+      const MISSION_OVER_MESSAGE = `Vous avez gagné la mission! Vous avez récupéré ${opponents.value[currentOpponentIndex.value].credit
+        } crédits!`
+      showAlert(MISSION_OVER_MESSAGE)
+    }
+    currentMission.value++
+    currentOpponentIndex.value++
+  } else {
+    player.value.credit += opponents.value[currentOpponentIndex.value].credit
+    handleGameWon()
   }
-  if (currentOpponentIndex.value >= MAX_MISSION) {
-    currentOpponentIndex.value = 0;
+}
+function handleEndMission() {
+  if (currentMission.value < MAX_MISSION) {
+    showAlert(MISSION_OVER_MESSAGE)
+    currentMission.value++
+    currentOpponentIndex.value++
+  } else {
+    handleGameWon()
   }
+}
+function handleRepair() {
+  if (currentMission.value < MAX_MISSION) {
+    repairShip()
+    currentMission.value++
+    currentOpponentIndex.value++
+  } else {
+    handleGameWon()
+  }
+}
+
+function repairShip() {
+  const costPerPercentage = 5;
+  const repairPercentage = 1;
+  const maxHealth = 100;
+
+  const maxRepairPercentage = Math.min(player.value.credit / costPerPercentage, maxHealth - player.value.ship.vitality);
+  const repairAmount = Math.floor(maxRepairPercentage / repairPercentage);
+  const healthToAdd = repairAmount * repairPercentage;
+  const creditSpent = repairAmount * costPerPercentage;
+
+  player.value.ship.vitality += healthToAdd;
+  player.value.credit -= creditSpent;
+
+  showAlert(`Vaisseau réparé de ${healthToAdd}% pour ${creditSpent} crédits.`);
+}
+
+function handleGameWon() {
+  const totalGameCredits = player.value.credit
+  const modalElement = document.querySelector('.modal')
+  const modal = Modal.getOrCreateInstance(modalElement)
+
+  emit('launchScore', totalGameCredits)
+
+  modalElement?.addEventListener('hidden.bs.modal', () => {
+    emit('updateScreen', SCORE_SCREEN)
+  })
+
+  const modalBody = modalElement?.querySelector('.modal-body')
+  if (modalBody) {
+    modalBody.textContent = `Félicitations! Vous avez gagné! Crédits gagnés: ${totalGameCredits}`
+  }
+
+  modal.show()
 }
 
 function handlePlayerAttack() {
-  let probability = fromExperienceToHitProbabilityConverter(PLAYER_RANK);
-  const randomProbability = Math.random();
+  let probability = fromExperienceToHitProbabilityConverter(PLAYER_RANK)
+  const randomProbability = Math.random()
   if (randomProbability <= probability) {
-    playerAttack();
-  } else {
-    console.log("player missed");
+    playerAttack()
   }
 }
 
 function handleOpponentAttack() {
   let probability = fromExperienceToHitProbabilityConverter(
-    opponents.value[currentOpponentIndex.value].experience
-  );
-  const randomProbability = Math.random();
+    opponents.value[currentOpponentIndex.value]?.experience
+  )
+  const randomProbability = Math.random()
   if (randomProbability <= probability) {
-    opponentAttack();
-  } else {
-    console.log("opponent missed");
+    opponentAttack()
   }
 }
 
 function playerAttack() {
   const playerDamage =
     getRandomAttackPercentage() *
-    opponentInitialVitalities.value[currentOpponentIndex.value];
+    opponentInitialVitalities.value[currentOpponentIndex.value]
   opponentCurrentVitalities.value[currentOpponentIndex.value] -=
-    playerDamage * 2;
+    playerDamage * 2 //6 à 12% de dégats pour bien balancer la difficulté
   if (opponentCurrentVitalities.value[currentOpponentIndex.value] < 0)
-    opponentCurrentVitalities.value[currentOpponentIndex.value] = 0;
+    opponentCurrentVitalities.value[currentOpponentIndex.value] = 0
 }
 
 function opponentAttack() {
-  const opponentDamage = getRandomAttackPercentage() * PLAYER_STARTING_LIFE;
-  player.value.ship.vitality -= opponentDamage;
-  if (player.value.ship.vitality < 0) player.value.ship.vitality = 0;
+  const opponentDamage = getRandomAttackPercentage() * PLAYER_STARTING_LIFE
+  player.value.ship.vitality -= opponentDamage
+  if (player.value.ship.vitality < 0) player.value.ship.vitality = 0
 }
 
 function getRandomAttackPercentage(): number {
-  const minPercentage = 0.03;
-  const maxPercentage = 0.06;
+  const minPercentage = 0.03
+  const maxPercentage = 0.06
   const randomPercentage =
-    Math.random() * (maxPercentage - minPercentage) + minPercentage;
-  return randomPercentage;
+    Math.random() * (maxPercentage - minPercentage) + minPercentage
+  return randomPercentage
 }
-
-const alertMessage = ref("");
 
 function showAlert(message: string) {
-  alertMessage.value = message;
-  const modalElement = document.querySelector(".modal");
-  const modal = Modal.getOrCreateInstance(modalElement);
-  modal.show();
-}
-
-function handleMissionOverMessage() {
-  const MISSION_OVER_MESSAGE = `Vous avez gagné la mission! Vous avez récupéré ${
-    opponents.value[currentOpponentIndex.value].credit
-  } crédits!`;
-  showAlert(MISSION_OVER_MESSAGE);
-}
-
-function handleGameOverMessage() {
-  const GAME_OVER_MESSAGE = `Vous êtes mort, la mission à échouée!`;
-  showAlert(GAME_OVER_MESSAGE);
+  alertMessage.value = message
+  const modalElement = document.querySelector('.modal')
+  const modal = Modal.getOrCreateInstance(modalElement)
+  modal.show()
 }
 </script>
 
@@ -230,149 +270,35 @@ function handleGameOverMessage() {
   <div id="Game" class="py-3 container-fluid" style="height: 84vh">
     <div class="row justify-content-center mb-5">
       <div class="col-7">
-        <div id="GameBox" class="row mx-auto">
-          <div class="bg-primary text-white d-flex align-items-center py-2">
-            <p class="m-0">Actions</p>
-          </div>
-          <div class="bg-light p-3" style="height: 15vh">
-            <div class="row mx-auto">
-              <div class="col">
-                <button
-                  @click="handleCombat"
-                  class="btn btn-primary form-control"
-                >
-                  Combattre
-                </button>
-              </div>
-              <div class="col">
-                <button onclick="" class="btn btn-primary form-control">
-                  Terminer la mission
-                </button>
-              </div>
-              <div class="col">
-                <button onclick="" class="btn btn-primary form-control">
-                  Terminer la mission et réparer le vaisseau
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ActionsCard :handleCombat="handleCombat" :handleEndMission="handleEndMission" :handleRepair="handleRepair" />
       </div>
       <div class="col-3">
-        <div id="GameBox" class="row mx-auto">
-          <div class="bg-primary text-white d-flex align-items-center py-2">
-            <p class="m-0">Mission en cours</p>
-          </div>
-          <div class="bg-light p-3" style="height: 15vh">
-            <p>{{ currentMission }}/5</p>
-            <p>
-              Objectif: survivre à 5 missions en obtenant le plus de crédits.
-            </p>
-          </div>
-        </div>
+        <MissionsCard :currentMission="currentMission" />
       </div>
     </div>
     <div class="row justify-content-center">
       <div class="col-6">
-        <div id="GameBox" class="row mx-auto">
-          <div class="bg-primary text-white d-flex align-items-center py-2">
-            <p class="m-0">{{ player.name }}</p>
-          </div>
-          <div class="bg-light text-white" style="height: 15vh">
-            <p>
-              {{ experienceConverter(player.experience) }} -
-              {{ player.credit }} CG
-            </p>
-            <p class="text-center">{{ player.ship.name }}</p>
-            <div class="container">
-              <div class="row justify-content-center mt-1">
-                <div class="col-md-12">
-                  <div class="progress">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      :style="{ width: player.ship.vitality + '%' }"
-                      aria-valuenow="100"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    >
-                      <span class="progress-text"
-                        >{{ Math.round(player.ship.vitality) }}%</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CharacterCard :characterToDisplay="player" :vitalityPercentage="Math.ceil(player.ship.vitality)" />
       </div>
       <div class="col-6" v-if="!isLoading">
-        <div id="GameBox" class="row mx-auto">
-          <div class="bg-primary text-white d-flex align-items-center py-2">
-            <p class="m-0">{{ opponents[currentOpponentIndex].name }}</p>
-          </div>
-          <div class="bg-light text-white" style="height: 15vh">
-            <p>
-              {{
-                experienceConverter(opponents[currentOpponentIndex].experience)
-              }}
-              - {{ opponents[currentOpponentIndex].credit }} CG
-            </p>
-            <p class="text-center">
-              {{ opponents[currentOpponentIndex].ship.name }}
-            </p>
-            <div class="container">
-              <div class="row justify-content-center mt-1">
-                <div class="col-md-12">
-                  <div class="progress">
-                    <div
-                      class="progress-bar bg-primary"
-                      role="progressbar"
-                      :style="{ width: opponentVitalityPercentage + '%' }"
-                      aria-valuenow="100"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                    >
-                      <span class="progress-text"
-                        >{{ opponentVitalityPercentage }}%</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CharacterCard :characterToDisplay="opponents[currentOpponentIndex]"
+          :vitalityPercentage="opponentVitalityPercentage" />
       </div>
     </div>
   </div>
 
-  <div
-    class="modal"
-    tabindex="-1"
-    role="dialog"
-  >
+  <div class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Mission Réussie!</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           {{ alertMessage }}
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             Fermer
           </button>
         </div>
@@ -384,11 +310,6 @@ function handleGameOverMessage() {
 <style scoped>
 #Game {
   height: 100%;
-}
-
-#GameBox {
-  border-radius: 10px;
-  overflow: hidden;
 }
 
 .progress {

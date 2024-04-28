@@ -179,6 +179,81 @@ const player = ref<Character>({
 </style>
 ```
 
+## Semaine 3
+
+
+## Diviser la vue du formulaire en composants est une excellente approche permettant de construire et exécuter des tests sur les différents cas de la soumission du formulaire. En effet, l'usage des props pour modifier les valeurs du formulaire rend les tests beaucoup plus facile!
+
+```ts
+<script setup lang="ts">
+// MainMenu.vue
+<RegisterForm
+      :playerName="playerName"
+      :playerShip="playerShip"
+      :formComplete="formComplete"
+      :ships="ships"
+      :formCompleted="formCompleted"
+      :errorLoadingShips="errorLoadingShips"
+      :isLoading="isLoading"
+      @formInvalid="handleInvalidForm"
+    />
+</script>
+```
+## La méthode utilisée dans les tests de la carte d'actions pendant le jeu (pour savoir si la fonction reliée au bouton est bien appelée) est très efficace! Elle permet de voir si la fonction passée par props est appelée ou non et c'est très simple et bien codé.
+```ts
+<script setup lang="ts">
+// ActionsCard.test.ts
+ it("fight button clicked launchs handleCombat", async () => {
+    const handleCombatMock = { isLaunched: false };
+    const wrapper = mount(ActionsCard, {
+      propsData: {
+        handleCombat: () => {
+          handleCombatMock.isLaunched = true;
+        },
+        handleEndMission: () => {},
+        handleRepair: () => {},
+      },
+    });
+
+    wrapper.find("#fightButton").trigger("click");
+    expect(handleCombatMock.isLaunched).toBe(true);
+  });
+```
+## Encore une fois, la division en plusieurs composants dans notre Game pour séparer chaque boite rend le code beaucoup plus clair et simple, permettant la création de tests beaucoup plus facilement.
+```ts
+<script setup lang="ts">
+
+// Game.vue
+<div id="Game" class="py-3 container-fluid" style="height: 84vh">
+    <div class="row justify-content-center mb-5">
+      <div class="col-7">
+        <ActionsCard
+          :handleCombat="handleCombat"
+          :handleEndMission="handleEndMission"
+          :handleRepair="handleRepair"
+        />
+      </div>
+      <div class="col-3">
+        <MissionsCard :currentMission="currentMission" />
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-6">
+        <CharacterCard
+          :characterToDisplay="player"
+          :vitalityPercentage="Math.ceil(player.ship.vitality)"
+        />
+      </div>
+      <div class="col-6" v-if="!isLoading">
+        <CharacterCard
+          :characterToDisplay="opponents[currentOpponentIndex]"
+          :vitalityPercentage="opponentVitalityPercentage"
+        />
+      </div>
+    </div>
+  </div>
+```
+
 <script setup>
 import { useData } from 'vitepress'
 

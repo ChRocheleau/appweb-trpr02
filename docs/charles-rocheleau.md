@@ -153,6 +153,47 @@ onMounted(async () => {
 </script>
 ```
 
+## Semaine 3
+
+## Pour le code suivant, le calcul du pourcentage utilise Computed. Cette facon de faire est un bon exemple d'utilisation d'une propriété calculée. La propriété computed garantit que le pourcentage est toujours à jour, ce qui améliore la maintenabilité du code. Excellent code!
+
+```ts
+<script setup lang="ts">
+//Game.vue
+const opponentVitalityPercentage = computed(() => {
+  const initialVitality =
+    opponentInitialVitalities.value[currentOpponentIndex.value];
+  const currentVitality =
+    opponentCurrentVitalities.value[currentOpponentIndex.value];
+  return Math.ceil((currentVitality / initialVitality) * 100);
+});
+</script>
+```
+## Ici la fonction est très simple et concise, facilitant la compréhension du code, elle crée efficacement une quantité aléatoire entre 0.03 et 0.06.
+```ts
+<script setup lang="ts">
+
+//Game.vue
+function getRandomAttackPercentage(): number {
+  const minPercentage = 0.03;
+  const maxPercentage = 0.06;
+  const randomPercentage =
+    Math.random() * (maxPercentage - minPercentage) + minPercentage;
+  return randomPercentage;
+}
+
+</script>
+```
+## Pour cette ligne de code, les scores sont organisés en ordre décroissant, le score le plus élevé en premier. Cette approche permet une manipulation efficace des données et garantit que les scores sont présentés tel que demandés dans le récit 2.
+```ts
+<script setup lang="ts">
+
+//Score.vue
+scores.value.sort((a, b) => b.playerScore - a.playerScore);
+
+</script>
+```
+
 <script setup>
 import { useData } from 'vitepress'
 
